@@ -22,7 +22,7 @@ if ( -not (test-path $Folder -pathtype container) )
 
 
 #returns average file size for all the files in the folder
-$Average= (Get-ChildItem $Folder  -Force | Measure-Object -Property Length -Sum).Sum 2> $null
+$Average= (Get-ChildItem $Folder  -Force | Measure-Object -Property Length -Average).Average 2> $null
 $AverageComplete = "{0:N0}" -f ($Average / 1KB) + "KB"
 write-host "The average file size in the ""$Folder"" folder is: "$AverageComplete""
 
