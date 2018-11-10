@@ -1,4 +1,4 @@
-﻿Function get-averagefilesize ([object]$Folder=$Foldermain) {
+Function get-averagefilesize ([object]$Folder) {
 #if no folder name is given then the function should default to looking in the PWD
 [IO.Directory]::SetCurrentDirectory((Get-Location))
 
@@ -29,4 +29,4 @@ write-host "The average file size in the ""$Folder"" folder is: "$AverageComplet
 }
 
 $Foldermain=$args[0]
-get-averagefilesize
+get-averagefilesize $Foldermain
