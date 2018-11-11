@@ -1,4 +1,21 @@
-﻿#function1
+﻿
+
+
+#function2
+[IO.Directory]::SetCurrentDirectory((Get-Location))
+function get-folder ($Folder2)
+{
+$Folderall = Get-ChildItem $Folder2 | Where-Object{($_.PSIsContainer)} | foreach-object{$_.Name}
+$collection =@(foreach ($i in $Folderall)
+{
+get-averagefilesize $i
+})
+
+$collection2 = $collection | Sort-Object {$_.average} -desc 
+write-output $Collection2
+}
+
+#function1
 Function get-averagefilesize ($Folder) {
 #if no folder name is given then the function should default to looking in the PWD
 [IO.Directory]::SetCurrentDirectory((Get-Location))
@@ -33,5 +50,5 @@ return $myobject
 #main script
 $Foldermain=$args[0]
 
-get-averagefilesize $Foldermain
-
+#get-averagefilesize $Foldermain
+get-folder $foldermain
