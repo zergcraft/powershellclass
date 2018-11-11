@@ -11,7 +11,7 @@ $collection =@(foreach ($i in $Folderall)
 get-averagefilesize $i
 })
 
-$collection2 = $collection | Sort-Object {$_.average} -desc 
+$collection2 = $collection | Sort-Object {$_.average} -desc | select -first 1
 write-output $Collection2
 }
 
