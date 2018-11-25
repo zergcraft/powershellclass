@@ -4,8 +4,11 @@
 #-use Where-Object pipeline with -Contains to check each file's extension
 
 
-#((get-childitem *.docx,*.xls,*.ppt).length).sum
+<#-- assign variable $MS to: Find Files in PWD, Find each file with docx,xlsx,pptx extensions and measure the length,
+then sum it all together: --#>
 
-$files=(get-childitem -file)
-$ms= (($files | ?{($_.extension -contains ".docx") -or ($_.extension -contains ".xlsx") -or ($_.extension -contains ".pptx")}) | measure length -sum).sum
+$ms= ((get-childitem -file | ?{($_.extension -contains ".docx") -or
+ ($_.extension -contains ".xlsx") -or ($_.extension -contains ".pptx")}) | measure length -sum).sum
+
+#Writes the value of $MS divided by 1KB and rounded by 2 decimals
 write-host "The total size of the MS Office files in this folder is: "([math]::round($ms/1KB,2))"KB"
