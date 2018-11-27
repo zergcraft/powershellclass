@@ -20,7 +20,19 @@
     
 # Read the old Users file:
 # --------------------------
-    $Users = Import-CSV Users.CSV
+    $ErrorActionPreference = "SilentlyContinue"
+    $Users = Import-CSV Users.CSV 
+    
+    
+#Check to see if import-csv command above was succesful, if not give error and exit
+#-----------------------------------------------------------------------------------
+if ( -not $? )
+{
+write-host –foregroundcolor red `
+"Unable to find Users.CSV in this folder, please retry!"
+$ErrorActionPreference = "Continue"
+exit 1
+}
 
 #Function to check if accountname already exists
 #-----------------------------------------------
@@ -149,8 +161,17 @@ $users += $New
 # ----------------------------------------------------------------------------------
 
 $users | sort AccountName | export-csv users.new -NoTypeInformation
-Move-Item -force Users.Csv Users.Bak
-Move-Item users.new Users.Csv
-    
+Move-Item -force Users.Csv Users.Bak -EA SilentlyContinue #if it errors, it continues to next line
+Move-Item users.new Users.Csv -EA SilentlyContinue #if it errors, it continues to next line
+
+#Check to see if the script was succesful in writing to the Users.CSV file
+#-----------------------------------------------------------------------------------
+if ( -not $? )
+{
+write-host –foregroundcolor red `
+"Unable to write to Users.CSV - File may be in use! Please re-run the script"
+exit 1
+}
+
 write-host
 write-host -foregroundcolor cyan "Username $UserIn has been added to the file"
