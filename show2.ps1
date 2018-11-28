@@ -14,7 +14,7 @@ if ($args.count -lt 2)
 if (-not (Test-Path $folder -pathtype container))
 {
     write-host "Folder:$Folder not found!"
-    exit 0 
+    exit 1
 }
 
 #IF Statement to check day of week is valid
@@ -22,7 +22,7 @@ if (-not (Test-Path $folder -pathtype container))
 if ($day -eq $null)
 {
     write-host "2nd argument is not a day of the week!"
-    exit 0
+    exit 1
 }
 
 
