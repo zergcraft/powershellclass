@@ -1,37 +1,34 @@
-﻿#function1
-Function get-averagefilesize ($Folder) {
-#if no folder name is given then the function should default to looking in the PWD
-[IO.Directory]::SetCurrentDirectory((Get-Location))
+﻿
 
-#if no folder name is given then the function defaults to current folder:
-if ($Folder -eq $null)
+Function Get-AverageFileSize ([string]$Foldername=".")    
+
+#check to see if folder exists, if not then return a 0
 {
-$Folder=(get-location).Path
+if ( -not (test-path $Foldername -pathtype container ) )
+{return 0}
+
+$filecount=0
+$totalfilesize=0
+get-childitem $Foldername | Where-Object {$_ -is [Io.FileInfo]} | foreach-object{
+$filecount ++
+$totalfilesize += $_.Length
+}
+if ($filecount -eq 0){return 0}
+
+return $totalfilesize/$filecount} 
+
+
+$HighestAverageSize=0
+$highestfoldername=""
+Get-ChildItem $args[0] -recurse | where-object{$_ -is [IO.DirectoryInfo]} | 
+Foreach-object{
+                $thisaveragesize=get-averagefilesize $_.FullName
+                        If ($ThisAveragesize -gt $HighestAverageSize )
+                        { $highestAverageSize=$ThisAverageSize
+                        $HighestFolderName = $_.FullName}
+              
 }
 
-#if given folder does not exist, return with an average size of zero
-if ( -not (test-path $Folder -pathtype container) )
-{
-        write-host -foregroundcolor red "`a`n`"$Folder`" does not exist or is not a folder"
-        write-host -foregroundcolor red "The average file size is 0 KBytes"
-        continue  
-}
-
-#returns average file size for all the files in the folder
-$Average= (Get-ChildItem $Folder  -Force -recurse | Measure-Object -Property Length -Average).Average 2> $null
-$AverageComplete = "{0:N0}" -f ($Average / 1KB) + "KB"
-$myObject = New-Object System.Object
-$myobject | add-member -type Noteproperty -name Name -value $Folder
-$myobject | add-member -type Noteproperty -name Average -value $Average
-return $myobject 
-
-
-}
-
-
-
-#main script
-$Foldermain=$args[0]
-
-get-averagefilesize $Foldermain
-
+write-host "The folder with the highest average size is:"
+write-host "$highestfoldername"
+write-host "It's average file size is" $HighestAverageSize.ToString('N0')
