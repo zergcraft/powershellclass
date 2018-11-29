@@ -8,6 +8,7 @@ if ($args.count -lt 2)
     write-host "This script needs 2 arguments"
     write-host "1) The folder"
     write-host "2) The day of week"
+    exit 1
 }
 
 #IF Statement to check if folder is valid
