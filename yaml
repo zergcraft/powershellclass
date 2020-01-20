@@ -1,0 +1,14 @@
+$ sudo nano /etc/netplan/*.yaml
+network:
+    version: 2
+    renderer: NetworkManager/ networkd
+    ethernets:
+       DEVICE_NAME:
+          dhcp4: yes/no
+          addresses: [IP_ADDRESS/NETMASK]
+          gateway: GATEWAY
+          nameservers:
+             addresses: [NAMESERVER_1, NAMESERVER_2]
+             
+sudo netplan apply
+sudo systemctl restart system-networkd
