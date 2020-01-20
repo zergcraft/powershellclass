@@ -1,0 +1,104 @@
+1)install apache
+sudo apt update
+sudo apt install pache2
+
+
+#adjust firewall to allow traffic
+sudo ufw app list
+
+#Allow incoming HTTP and HTTPS traffic for this profile (APache Full)
+sudo ufw allow in "Apache Full"
+
+#Check if apache is up
+curl 192.168.1.73(server ip)
+
+2)Install MYSQL
+sudo apt install mysql-server
+
+#run mysql security script
+sudo mysql_secure_installation
+
+switch mysql to auth using password:
+sudo mysql
+#check user information
+SELECT user,authentication_string,plugin,host FROM mysql.user;
+#change root to login by password
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password';
+#reload grant tables to apply changes
+FLUSH PRIVILEGES;
+
+3)Install PHP
+sudo apt install php libapache2-mod-php php-mysql
+
+#make apache prefer PHP files
+sudo nano /etc/apache2/mods-enabled/dir.conf
+move the index.php after DirectoryIndex
+#restart apache
+sudo systemctl restart apache2
+sudo systemctl status apache2
+
+4) Setup vhosts
+#make a dir for your domain
+sudo mkdir /var/www/raf
+
+#change ownership
+sudo chown -R $USER:$USER /var/www/your_domain
+
+#create a index.html in your domain folder
+nano /var/www/raf/index.html
+
+add:
+<html>
+    <head>
+        <title>Welcome to Your_domain!</title>
+    </head>
+    <body>
+        <h1>Success!  The your_domain server block is working!</h1>
+    </body>
+</html>
+
+#make a vhost file with correct directives
+sudo nano /etc/apache2/sites-available/raf.conf
+add:
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    ServerName your_domain
+    ServerAlias www.your_domain
+    DocumentRoot /var/www/your_domain
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+
+
+#enable vhost file with a2ensite tool
+sudo a2ensite raf.conf
+
+#disable default site
+sudo a2dissite 000-default.conf
+
+#test config for errors
+sudo apache2ctl configtest
+
+#restart apache to implement changes
+sudo systemctl restart apache2
+
+###IF ERROR:
+#apache2: Could not determine the server's fully qualified domain name, 
+#using 127.0.0.1 for ServerName
+#create /etc/apache2/conf-available/fqdn.conf
+add:
+ServerName localhost
+#enable the new fqdn.conf
+sudo a2enconf fqdn
+
+5) Test PHP
+#create info.php
+sudo nano /var/www/your_domain/info.php
+add:
+<?php
+phpinfo();
+?>
+
+
+
+
