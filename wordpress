@@ -1,0 +1,105 @@
+INstall Wordpress
+
+1)Create mysql for wordpress
+#login to mysql as root
+
+mysql -u root -p
+
+#create wordpress database
+CREATE DATABASE wordpress DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+
+#create mysql user account************
+GRANT ALL ON wordpress.* TO 'wordpressuer'@'localhost' IDENTIFIED BY 'password'; (REPLACE password with R19590718z7!)
+
+FLUSH PRIVILEGES;
+
+EXIT;
+
+2) Install php extensions
+
+sudo apt-get update
+sudo apt-get install php-curl php-gd php-mbstring php-mcrypt php-xml php-xmlrpc
+
+#restart apache2
+sudo systemctl restart apache2
+
+3) Adjust Apache config to allow for .htaccess override and rewrites
+#Enable htaccess
+sudo nano /etc/apache2/apache2.conf
+add:
+<Directory /var/www/html/>
+    AllowOverride All
+</Directory>
+
+#Enable rewrite module
+sudo a2enmod rewrite
+
+#Enable changes
+sudo apache2ctl configtest
+
+#restart apache to apply changes
+sudo systemctl restart apache2
+
+
+4) DOwnload WORDPRESS
+#naviage to tmp and download wp
+cd /tmp
+curl -O https://wordpress.org/latest.tar.gz
+
+#extract file 
+tar xzvf latest.tar.gz
+
+#create dummy htaccess file
+touch /tmp/wordpress/.htaccess
+chmod 660 /tmp/wordpress/.htaccess
+
+#copy sample config file to wordpress
+cp /tmp/wordpress/wp-config-sample.php /tmp/wordpress/wp-config.php
+
+#create upgrade directory
+mkdir /tmp/wordpress/wp-content/upgrade
+
+#copy entire dir to document root 
+sudo cp -a /tmp/wordpress/. /var/www/raf
+
+5) Configure WP Directory
+
+#adjust ownership+permissions
+sudo chown -R raf:www-data /var/www/raf
+
+#run two find commands to set permissions to wordpress dirs and files
+sudo find /var/www/raf/ -type d -exec chmod 750 {} \;
+sudo find /var/www/raf/ -type f -exec chmod 640 {} \;
+
+#setup the wp config file
+#grab secure values from WP secret key generator
+curl -s https://api.wordpress.org/secret-key/1.1/salt/ > /tmp/salt
+
+#open wp config file and paste salt
+nano /var/www/raf/wp-config.php
+
+#go to line to replace and press "control r" and select /tmp/salt
+#delete original lines
+
+#edit wp-config.php
+nano /var/www/raf/wp-config.php
+. . .
+
+define('DB_NAME', 'wordpress');
+
+/** MySQL database username */
+define('DB_USER', 'wordpressuser');
+
+/** MySQL database password */
+define('DB_PASSWORD', 'password');
+
+. . .
+
+define('FS_METHOD', 'direct');
+
+6) Complete install through web interface
+https://server_domain_or_IP
+
+
+
+
